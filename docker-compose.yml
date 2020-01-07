@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    depends_on:
+      - mydb
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    networks:
+      - test-net
+
+  mydb:
+    image: postgres
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: data
+    ports:
+      - 5433:5432/tcp
+    networks:
+      - test-net
+
+volumes: 
+  db-data:
+    driver: local
+
+networks:
+  test-net:
+    driver: bridge
