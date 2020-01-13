@@ -1,0 +1,26 @@
+{% extends "base_template.html" %}
+{% block title %}Tutorial slug{% endblock %}
+{% block content %}
+	<div>
+		{{lenp}}
+		{% for row in rowsp %}
+		<li><a href="/search_results/{{row}}">{{row}}</a></li>
+		{% endfor %}
+	</div>
+	---------------------------------<br>
+	{{query}}<br>
+	---------------------------------
+	<div>
+		{{lenh}}
+		{% for row in rowsh %}
+		<li><a href="/search_results/{{row}}"><p> {{row}} </p></a>	</li>
+		{% endfor %}
+	</div>
+	---------------------------------
+	<div>
+		{{lent}}
+		{% for row in rowst %}
+		<li> <p> {{row}} </p></li>
+		{% endfor %}
+	</div>
+{% endblock %}

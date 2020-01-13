@@ -2,11 +2,10 @@
 {% block title %}Tutorial Flask: Miniblog{% endblock %}
 {% block content %}
     <ul>
-    	da
-    	<li>{{cas_hiba.columns.keys()}}</li>
-    {% for post in posts %}
-        <li><a href= "/p/{{post.title_slug}}">{{ post.title }}</a></li>
-    {% endfor %}
+    	da extra		
+    	{% for post in posts %}
+        <li>{{post}}</li>
+    	{% endfor %}
     sad
     </ul>
 {% endblock %}

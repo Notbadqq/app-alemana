@@ -3,6 +3,8 @@ version: '3'
 services:
   web:
     build: ./web
+    depends_on:
+      - mydb
     ports:
       - 5000:5000
     volumes:
