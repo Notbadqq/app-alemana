@@ -1,0 +1,10 @@
+{% extends "base_template.html" %}
+{% block title %}{{ slug_title }}{% endblock %}
+{% block content %}
+    {% for post in posts %}
+        {% if post.title_slug == slug_title%}
+        <li>Mostrando el post {{ post.title }}</li>
+        <li>{{post.content}}</li>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

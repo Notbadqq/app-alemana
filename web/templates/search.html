@@ -1,0 +1,17 @@
+{% extends "base_template.html" %}
+{% block title %}Tutorial slug{% endblock %}
+{% block content%}
+    <div>
+        <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.description.label }}
+            {{ form.description }}<br>
+            {% for error in form.description.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+            {{ form.submit() }}
+        </div>
+        </form>
+    </div>
+{% endblock %}
