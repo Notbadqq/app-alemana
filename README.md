@@ -1,6 +1,6 @@
 # **¿Cómo utilizar esta aplicación?**
 ## **Pasos a seguir:**
-  1. Clone o descargue la aplicación en la carpeta deseada, ya sea con git clone o descargando el zip del repositorio, en la dirección deseada.
+  1. Clone o descargue la aplicación en la carpeta deseada, ya sea con git clone o descargando el zip del repositorio.
   
   2. Desde la terminal ingrese al archivo descargado, e ingrese los comandos:
   
