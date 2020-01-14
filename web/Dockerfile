@@ -12,9 +12,9 @@ WORKDIR /appli
 
 RUN pip install Flask && \
 	pip install Flask-WTF && \
-	pip install flask-login && \
 	pip install flask-sqlalchemy && \
-	pip install psycopg2-binary
+	pip install psycopg2-binary && \
+	pip install flask-bootstrap
 
 COPY . /appli
 

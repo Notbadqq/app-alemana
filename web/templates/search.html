@@ -2,11 +2,20 @@
 {% block title %}Tutorial slug{% endblock %}
 {% block content%}
     <div>
-        <form action="" method="POST" novalidate>
+        <form action="" method="POST" novalidate autocomplete="off">
         {{ form.hidden_tag() }}
         <div>
             {{ form.description.label }}
             {{ form.description }}<br>
+            <label for="description">Concepto</label>
+            <input type="text" id="descriptions" name="description" list="description-list" onkeypress="{% %}">
+            <script> function getDesc(){
+            } </script>
+            <datalist id="description-list">
+                {% for desc in description %}
+                <option> {{desc}} </option>
+                {% endfor %}
+            </datalist>
             {% for error in form.description.errors %}
             <span style="color: red;">{{ error }}</span>
             {% endfor %}
