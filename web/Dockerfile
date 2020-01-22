@@ -20,4 +20,4 @@ COPY . /appli
 
 ENTRYPOINT [ "python" ]
 
-CMD [ "app.py" ]
+CMD [ "run.py" ]

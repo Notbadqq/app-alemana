@@ -11,16 +11,10 @@
         <!-- Javascript -->
         <script>
             $(function() {
-                var available  =  [];
-                "{% for row in desc %}"
-                    available.push("{{row}}")
-                "{% endfor %}"
                 $( "#descriptions" ).autocomplete({
-                    source: function(request, response) {
-                var results = $.ui.autocomplete.filter(available, request.term);
-        
-                response(results.slice(0, 10));
-            }, minLength:3
+                    source: function(request, response){
+                        $.getJSON("{{ url_for('test') }}", {consulta:request.term}, response)[0];
+            }, minlength:3
                 });
             });
         </script>
