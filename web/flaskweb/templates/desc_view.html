@@ -1,22 +1,52 @@
 {% extends "base_template.html" %}
-{% block title %}Tutorial slug{% endblock %}
+{% block title %}<title>{{query[0]}}</title>{% endblock %}
+{% block script %}
+<script>
+	function selectAll(checkList, checkMain){
+		for(var i=0; i<checkList.length; i++){
+			checkList[i].checked = checkMain.checked;
+			checkChange(checkList[i]);
+		}
+	}
+	function checkFatherChange(checkboxElem){
+		checkboxes = document.getElementsByName("padre");
+		selectAll(checkboxes,checkboxElem)
+	}
+	function checkSonChange(checkboxElem){
+		checkboxes = document.getElementsByName("hijo");
+		selectAll(checkboxes,checkboxElem)
+	}
+</script>
+{% endblock %}
 {% block content %}
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-md-3">
-			{{lenp}}
+		<div class="col-md-4">
+			<p><input type="checkbox" id="bigdaddy" onchange="checkFatherChange(this)">Padres: {{lenp}}</p>
 			{% for row in rowsp %}
-			<li><a href="/search_results/{{row}}">{{row}}</a></li>
+			<input type="checkbox" id="{{row}}" name="padre" value="{{row}}" onchange="checkChange(this)"><a href="/search_results/{{row}}">{{row}}</a><br>
+			<script>
+				pageCheck("{{row}}")
+			</script>
 			{% endfor %}
 		</div>
 		<div class="col-md-3">
 			<p>Description: {{query[0]}}</p>
 			<p>Concept ID: {{query[1]}}</p>
 		</div>
-		<div class="col-md-3">
-			{{lenh}}
+		<div class="col-md-1">
+			<input type="checkbox" id="{{query[0]}}" value="{{query[0]}}" onchange="checkChange(this)">
+			<script>
+				pageCheck("{{query[0]}}")
+			</script>
+		</div>
+		<div class="col-md-4">
+			<p><input type="checkbox" id="smolkiddo" onchange="checkSonChange(this)">Hijos: {{lenh}}</p>
 			{% for row in rowsh %}
-			<li><a href="/search_results/{{row}}">{{row}}</a></li>
+			<input type="checkbox" id="{{row}}" name='hijo' value="{{row}}" onchange="checkChange(this)"><a href="/search_results/{{row}}">{{row}}</a><br>
+			<script>
+				pageCheck("{{row}}")
+			</script>
 			{% endfor %}
 		</div>
 	</div>

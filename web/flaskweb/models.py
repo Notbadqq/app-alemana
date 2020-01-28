@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flaskweb import db
-
-from sqlalchemy import create_engine, MetaData, Table, select
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy import create_engine, MetaData, Table, select, Column, String, Integer
 from sqlalchemy.orm import Query, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import os
@@ -14,9 +14,14 @@ class Cas_hiba(Base):
     """"""
     __table__ = Table('cas_hiba', Base.metadata,
                     autoload=True, autoload_with=engine)
-    def __repr__(self):
-        return "{'concepto_id':%s, 'description_nombre':%s, 'description_id':%s, 'concept_id_HIBA':%s, 'tipo_termino':%s, 'termino_preferido':%s}" % (self.concepto_id, self.description_nombre, self.description_id, self.concept_id_HIBA, self.tipo_termino, self.termino_preferido)
-    
+
+connection.execute('INSERT INTO token_table(termino_preferido, token, concept_id_hiba) SELECT termino_preferido, to_tsvector(termino_preferido) as token, "concept_id_HIBA" FROM cas_hiba ON CONFLICT (termino_preferido) DO NOTHING')
+
+class Token_table(Base):
+    """"""
+    __table__ = Table('token_table', Base.metadata,
+                    autoload=True, autoload_with=engine)
+
 def loadSession():
     """"""
     metadata = Base.metadata

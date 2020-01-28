@@ -1,0 +1,28 @@
+{% extends "base_template.html"%}
+{%block title%}<title>Verificar Cohorte</title>{%endblock%}
+{%block script%}
+<script>
+    function addIdCode(desc){
+        $.getJSON("{{ url_for('get_idcode')}}", {descrip: desc} ,function(data){
+            document.getElementById(desc).innerHTML = data;
+        })
+        
+    }
+</script>
+{%endblock%}
+{%block content%}
+    {%for desc in lista%}
+    <div class="row">
+        <div class="col-md-6">
+            <input type="checkbox"  name='hijo' value="{{desc}}" onchange="checkChange(this)">{{desc}},
+        </div>
+        <div class="col-md-4">
+            <label id="{{desc}}"></label><br>
+        </div>
+    </div>
+    <script>
+        pageCheck("{{desc}}")
+        addIdCode("{{desc}}")
+    </script>
+    {%endfor%}
+{%endblock%}

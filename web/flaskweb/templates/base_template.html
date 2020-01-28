@@ -2,7 +2,7 @@
 <html lang = "en">
     <head>
         <meta charset = "utf-8">
-        {%block title%}<title>jQuery UI Autocomplete functionality</title>{%endblock%}
+        {%block title%}<title>Inicio</title>{%endblock%}
         <link rel="stylesheet" href="/static/bootstrap.min.css">
         <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
             rel = "stylesheet">
@@ -10,26 +10,71 @@
         <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
         <!-- Javascript -->
         <script>
+            var listatest = [];
+            $.ajaxSetup({
+                async: false
+            });
+            $.getJSON("{{ url_for('elim_rest')}}", function(response){
+                for(var i=0;i<response.length;i++){
+                    listatest.push(response[i]);
+                    }
+                }
+            )
             $(function() {
                 $( "#descriptions" ).autocomplete({
                     source: function(request, response){
-                        $.getJSON("{{ url_for('test') }}", {consulta:request.term}, response)[0];
-            }, minlength:3
+                        $.getJSON("{{ url_for('test') }}", {consulta:request.term}, response);
+                    }, minlength:3
                 });
             });
+            function eliminar_cohorte(){
+                $.getJSON("{{ url_for('elim_rest')}}", {action:'elim'})
+                listatest=[];
+                var checkList = $("input:checkbox")
+                for(var i=0; i<checkList.length; i++){
+                    pageCheck(checkList[i].id);
+                }
+            }
+            function pageCheck(desc){
+                if (listatest.indexOf(desc) >= 0){
+                    document.getElementById(desc).checked=true;
+                }
+                else{
+                    document.getElementById(desc).checked=false;
+                }
+            }
+            function checkChange(checkboxElem){
+                if (checkboxElem.checked){
+                    $.getJSON("{{ url_for('show_lista')}}", {description:checkboxElem.value, tipo:'check'})
+                }else{
+                    $.getJSON("{{ url_for('show_lista')}}", {description:checkboxElem.value, tipo:'uncheck'})
+                }
+            }
         </script>
+        {% block script %}
+        {% endblock %}
     </head>
    
     <body>
-        <nav>
-            <ul>
+        <br>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-4">
+
                 <form action="" method="POST" novalidate autocomplete="off"> 
                     {{ form.hidden_tag() }}
                     {{ form.description.label }}
                     {{ form.description }}
                 </form>
-            </ul>
-        </nav>
+            </div>
+            <div class="col-md-4">
+                <button type="button" onclick="eliminar_cohorte()">Eliminar Cohorte</button>
+            </div>
+            <div class="col-md-3">
+                <a href="{{url_for('create_cohorte')}}"><button type="button">Crear Cohorte</button></a>
+            </div>
+        </div>
+        <br>
         {%block content%}
         {%endblock%}
     </body>

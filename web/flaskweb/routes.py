@@ -1,19 +1,24 @@
 from flask import Flask, render_template, redirect, request, url_for, jsonify, Response, json
 from flaskweb import app
 from flaskweb.forms import PostForm, SignupForm, LoginForm, DescriptionForm
-from flaskweb.models import connection, session, Cas_hiba
+from flaskweb.models import connection, session, Cas_hiba, Token_table
 
+lista=[]
+
+def elimCohorte():
+    global lista
+    lista = []
 
 def search_son(concept):
-    result = connection.execute('SELECT DISTINCT termino_preferido FROM cas_hiba, hiba_snomed, (SELECT hijo FROM cas_hiba, hiba_snomed, transitiva WHERE termino_preferido=%s AND "concept_id_HIBA"="conceptid_HIBA" AND "conceptidSN"=padre AND es_directo=true) AS tabla_id_h WHERE hijo="conceptidSN" AND "concept_id_HIBA"="conceptid_HIBA" AND tipo_termino=%s', (concept, 'Preferido'))
+    result = connection.execute('SELECT DISTINCT termino_preferido FROM cas_hiba, hiba_snomed, (SELECT DISTINCT hijo FROM cas_hiba, hiba_snomed, transitiva WHERE termino_preferido=%s AND "concept_id_HIBA"="conceptid_HIBA" AND "conceptidSN"=padre AND es_directo=true) AS tabla_id_h WHERE hijo="conceptidSN" AND "concept_id_HIBA"="conceptid_HIBA" AND tipo_termino=%s', (concept, 'Preferido'))
     rows = []
     for row in result:
-        rowstr = str(row)
-        rows.append(rowstr[3:-3])
+        for i in row:
+            rows.append(i)
     return rows
 
 def search_parents(concept):
-    result = connection.execute('SELECT DISTINCT termino_preferido FROM cas_hiba, hiba_snomed, (SELECT padre FROM cas_hiba, hiba_snomed, transitiva WHERE termino_preferido=%s AND "concept_id_HIBA"="conceptid_HIBA" AND "conceptidSN"=hijo AND es_directo=true) AS tabla_id_p WHERE padre="conceptidSN" AND "concept_id_HIBA"="conceptid_HIBA" AND tipo_termino=%s', (concept, 'Preferido'))
+    result = connection.execute('SELECT DISTINCT termino_preferido FROM cas_hiba, hiba_snomed, (SELECT DISTINCT padre FROM cas_hiba, hiba_snomed, transitiva WHERE termino_preferido=%s AND "concept_id_HIBA"="conceptid_HIBA" AND "conceptidSN"=hijo AND es_directo=true) AS tabla_id_p WHERE padre="conceptidSN" AND "concept_id_HIBA"="conceptid_HIBA" AND tipo_termino=%s', (concept, 'Preferido'))
     rows = []
     for row in result:
         for i in row:
@@ -45,8 +50,8 @@ def search_results(query):
     rowst=[]
     for row in query:
         for i in row:
-            rowst.append(i)    
-    return render_template('desc_view.html', query=rowst, rowsp=rowsp, rowsh=rowsh, lenp=len(rowsp), lenh=len(rowsh), form=form)
+            rowst.append(i) 
+    return render_template('desc_view.html', query=rowst, rowsp=rowsp, rowsh=rowsh, lenp=len(rowsp), lenh=len(rowsh), form=form, lista=lista)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -78,9 +83,47 @@ def test():
                 arreglo = pal + ":*"
             else:
                 arreglo += " & " + pal + ":*"
-    result = connection.execute('SELECT termino_preferido FROM (SELECT termino_preferido, to_tsvector(termino_preferido) AS pref_token FROM (SELECT DISTINCT termino_preferido FROM cas_hiba) AS tabla ) AS foo WHERE pref_token @@ to_tsquery(%s) LIMIT 10', arreglo)
+    result = connection.execute('SELECT termino_preferido FROM token_table WHERE token @@ to_tsquery(%s) LIMIT 10', arreglo)
     obj_result=[]
     for row in result:
         obj_result.append(str(row[0]))
     return Response(json.dumps(obj_result), mimetype='application/json')
 
+@app.route("/show_check", methods=['GET'])
+def show_lista():
+    tipo=request.args.get('tipo', type=str)
+    description=request.args.get('description', type=str)
+    try:
+        if tipo=='check':
+            if description not in lista:
+                lista.append(description)
+        else:
+            lista.remove(description)
+    except:
+        pass
+    return Response(json.dumps(lista), mimetype='application/json')
+
+@app.route("/aceptar_cohorte", methods=['GET', 'POST'])
+def create_cohorte():
+    form=theForm()
+    lista.sort()
+    if request.method == 'POST' and form.validate_on_submit():
+        return redirect(url_for('search_results', query=form.description.data))
+    return render_template('select_cohorte.html', lista=lista, form=form)
+
+@app.route("/elim_rest", methods=['Get'])
+def elim_rest():
+    action = request.args.get('action', type=str)
+    if action == "elim":
+        elimCohorte()
+    return Response(json.dumps(lista), mimetype='application/json')
+
+@app.route("/get_idcode", methods=['GET'])
+def get_idcode():
+    desc = request.args.get('descrip', type=str)
+    result = connection.execute('SELECT DISTINCT "concept_id_HIBA" FROM cas_hiba WHERE termino_preferido=%s', desc)
+    rows = []
+    for row in result:
+        for i in row:
+            rows.append(i)
+    return Response(json.dumps(rows), mimetype='application/json')
