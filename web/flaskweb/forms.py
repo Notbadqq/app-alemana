@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Email, Length
 
-#Clase post, puede servir de guia para mantener registro de cohortes
+#Clase post, puede servir de guia para mantener registro de agrupacion para cohorte
 class PostForm(FlaskForm):
     title = StringField('Titulo', validators=[DataRequired(), Length(max=128)])
     title_slug = StringField('Titulo slug', validators=[Length(max=128)])

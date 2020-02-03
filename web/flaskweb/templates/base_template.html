@@ -16,6 +16,10 @@
             de forma dinamica y no estatica
             */
             var listatest = [];
+            /*
+            Para agregar los datos a la lista se necesita que async sea false, para que
+            no se termine de cargar la página antes de tenerlos.
+            */
             $.ajaxSetup({
                 async: false
             });
@@ -29,7 +33,8 @@
                 async: true
             });
             /*
-            Funcion utilizada por el buscador para generar el autocomplete
+            Funcion utilizada por el buscador para generar el autocomplete, hace una llamada a la
+            url de autocomplete para obtener los datos que requiere para hacer el autocompletado.
             */
             $(function() {
                 $( "#descriptions" ).autocomplete({
@@ -53,6 +58,7 @@
             /*
             Funcion que chequea el estado de un checkbox con respecto al listado de
             descripciones para saber si debe estar marcado o no
+            Recibe un concepto a chequear
             */
             function pageCheck(desc){
                 if (listatest.indexOf(desc) >= 0){
@@ -68,8 +74,7 @@
     </head>
    
     <body>
-        <br>
-        <div class="row">
+        <div class="row" style="background-color: rgb(71, 209, 191); padding-top: 1%; padding-bottom: 0.5%;">
             <div class="col-md-1"></div>
             <div class="col-md-4">
 
@@ -80,10 +85,10 @@
                 </form>
             </div>
             <div class="col-md-4">
-                <button type="button" onclick="eliminar_cohorte()">Eliminar Cohorte Completa</button>
+                <button type="button" style="background-color: rgb(4, 148, 141); color: rgb(240, 244, 248);" onclick="eliminar_cohorte()">Eliminar Cohorte Completa</button>
             </div>
             <div class="col-md-3">
-                <a href="{{url_for('create_cohorte')}}"><button type="button">Verificar Cohorte</button></a>
+                <a href="{{url_for('create_cohorte')}}"><button type="button" style="background-color: rgb(4, 148, 141); color: rgb(240, 244, 248);" >Verificar Cohorte</button></a>
             </div>
         </div>
         <br>
