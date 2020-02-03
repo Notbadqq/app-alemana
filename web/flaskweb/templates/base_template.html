@@ -3,6 +3,7 @@
     <head>
         <meta charset = "utf-8">
         {%block title%}<title>Inicio</title>{%endblock%}
+        <!-- Carga de css para bootsrap y jquery -->
         <link rel="stylesheet" href="/static/bootstrap.min.css">
         <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
             rel = "stylesheet">
@@ -10,44 +11,55 @@
         <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
         <!-- Javascript -->
         <script>
+            /*
+            Lista creada para verificar las descripciones agregadas a la cohorte
+            de forma dinamica y no estatica
+            */
             var listatest = [];
             $.ajaxSetup({
                 async: false
             });
-            $.getJSON("{{ url_for('elim_rest')}}", function(response){
+            $.getJSON("{{ url_for('eliminar')}}", function(response){
                 for(var i=0;i<response.length;i++){
                     listatest.push(response[i]);
                     }
                 }
             )
+            $.ajaxSetup({
+                async: true
+            });
+            /*
+            Funcion utilizada por el buscador para generar el autocomplete
+            */
             $(function() {
                 $( "#descriptions" ).autocomplete({
                     source: function(request, response){
-                        $.getJSON("{{ url_for('test') }}", {consulta:request.term}, response);
+                        $.getJSON("{{ url_for('autocomplete') }}", {consulta:request.term}, response);
                     }, minlength:3
                 });
             });
+            /*
+            Funcion que limpia el listado de la cohorte y actualiza los checkboxes
+            para que estos se desmarquen
+            */
             function eliminar_cohorte(){
-                $.getJSON("{{ url_for('elim_rest')}}", {action:'elim'})
+                $.getJSON("{{ url_for('eliminar')}}", {action:'elim'})
                 listatest=[];
                 var checkList = $("input:checkbox")
                 for(var i=0; i<checkList.length; i++){
                     pageCheck(checkList[i].id);
                 }
             }
+            /*
+            Funcion que chequea el estado de un checkbox con respecto al listado de
+            descripciones para saber si debe estar marcado o no
+            */
             function pageCheck(desc){
                 if (listatest.indexOf(desc) >= 0){
                     document.getElementById(desc).checked=true;
                 }
                 else{
                     document.getElementById(desc).checked=false;
-                }
-            }
-            function checkChange(checkboxElem){
-                if (checkboxElem.checked){
-                    $.getJSON("{{ url_for('show_lista')}}", {description:checkboxElem.value, tipo:'check'})
-                }else{
-                    $.getJSON("{{ url_for('show_lista')}}", {description:checkboxElem.value, tipo:'uncheck'})
                 }
             }
         </script>
@@ -68,10 +80,10 @@
                 </form>
             </div>
             <div class="col-md-4">
-                <button type="button" onclick="eliminar_cohorte()">Eliminar Cohorte</button>
+                <button type="button" onclick="eliminar_cohorte()">Eliminar Cohorte Completa</button>
             </div>
             <div class="col-md-3">
-                <a href="{{url_for('create_cohorte')}}"><button type="button">Crear Cohorte</button></a>
+                <a href="{{url_for('create_cohorte')}}"><button type="button">Verificar Cohorte</button></a>
             </div>
         </div>
         <br>
