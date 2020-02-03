@@ -10,6 +10,23 @@
     var rowsid_p = []
 	var rowstp_h = []
     var rowsid_h = []
+</script>
+
+	<!--Se agregan los datos de descripciones e ids a las variables-->
+{% for i in range(lenp) %}
+    <script>
+        rowstp_p.push("{{rowsp[i]}}")
+        rowsid_p.push("{{rowspid[i]}}")		
+    </script>
+{% endfor %}
+{% for i in range(lenh) %}
+    <script>
+        rowstp_h.push("{{rowsh[i]}}")
+        rowsid_h.push("{{rowshid[i]}}")
+    </script>
+{% endfor %}
+
+<script>
 	/*
 	Una vez cargada la pagina se ejecuta esta funcion para revisar el estado de 
 	los checkboxes select all.
@@ -39,6 +56,8 @@
 	/*
     Funcion que chequea el estado de un checkbox para añadir o quitar de la 
     cohorte un concepto
+	Recibe el checkbox seleccionado y el concepto e id a agregar o quitar dependiendo si
+	fue chequeado o no el checkbox.
     */
 	function checkChange(checkboxElem, desc, id){
 
@@ -55,24 +74,10 @@
 			checkSelectAll('kiddo', checkboxes_a);
 		}
     }
-</script>
 
-<!--Se agregan los datos de descripciones e ids a las variables-->
-{% for i in range(lenp) %}
-    <script>
-        rowstp_p.push("{{rowsp[i]}}")
-        rowsid_p.push("{{rowspid[i]}}")		
-    </script>
-{% endfor %}
-{% for i in range(lenh) %}
-    <script>
-        rowstp_h.push("{{rowsh[i]}}")
-        rowsid_h.push("{{rowshid[i]}}")
-    </script>
-{% endfor %}
-<script>
 	/*
-	Funcion para el check all de los terminos padre.
+	Funcion para el check all de los terminos padres.
+	Recibe el checkbox del select all padres para ver su estado.
 	*/
 	function checkFatherChange(checkboxElem){
 		for(var i=0; i<checkboxes_p.length; i++){
@@ -81,7 +86,8 @@
 		checkChangeDirect(checkboxElem, rowstp_p)
 	}
 	/*
-	Funcion para el check all de los terminos hijo.
+	Funcion para el check all de los terminos hijos.
+	Recibe el checkbox del select all hijos para ver su estado.
 	*/
 	function checkSonChange(checkboxElem){
 		for(var i=0; i<checkboxes_h.length; i++){
@@ -91,8 +97,10 @@
 	}
 	/*
 	Funcion para agregar todas las descendencias a la lista
+	Recibe un checkbox de seleccionar todo para ver su estado, tambien un 
+	array de conceptos a agregar a la lista.
 	*/
-	function checkChangeDirect(checkboxElem, concepts, familiar){
+	function checkChangeDirect(checkboxElem, concepts){
 		var query = "";
 		for (var x=0; x<concepts.length; x++){
 			query = query.concat("'")
@@ -105,24 +113,11 @@
                     $.getJSON("{{ url_for('allDirect')}}", {concept:query, action:'uncheck'})
                 }
 	}
+
 	/*
-	Funcion para agregar todas las descendencias a la lista
-	*/
-	function checkAllDescendance(checkMain){
-		var query = "";
-		for (var x=0; x<rowstp_h.length; x++){
-			query = query.concat("'")
-			query = query.concat(String(rowstp_h[x]));
-			query = query.concat("', ")
-		}
-		if (checkMain.checked){
-                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'check'})
-                }else{
-                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'uncheck'})
-                }
-	}
-	/*
-	Funcion para seleccionar toda la descendencia de un checkbox
+	Funcion para seleccionar o quitar la descendencia de un checkbox, dependiendo si
+	chequeado o no el checkbox.
+	Recibe el chebox que fue checkeado y un concepto del cual se buscara la descendencia
 	*/
 	function checkDescendance(checkboxElem, desc){
 		if (checkboxElem.checked){
@@ -132,29 +127,33 @@
                 }
 	}
 	/*
-	Funcion para agregar todas las descendencias a la lista
+	Funcion para agregar o quitar todas las descendencias del concepto principal a la lista
+	Recibe el checkbox de select all llamado kiddo
 	*/
-	function checkAllDescendance(checkMain){
+	function checkAllDescendance(checkboxElem){
 		var query = "";
 		for (var x=0; x<rowstp_h.length; x++){
 			query = query.concat("'")
 			query = query.concat(String(rowstp_h[x]));
 			query = query.concat("', ")
 		}
-		if (checkMain.checked){
+		if (checkboxElem.checked){
                     $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'check'})
                 }else{
                     $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'uncheck'})
                 }
 	}
+
 	/*
-	Funcion para seleccionar todos los checkboxes de descendencia
+	Funcion para seleccionar o deseleccionar todos los checkboxes de descendencia
+	como también llamar a checkAlldescendance para que agregue los terminos a la lista.
+	Recibe el checkbox kiddo para ver su estado.
 	*/
-	function selectAllDescendancy(checkMain){
+	function selectAllDescendancy(checkboxElem){
 		for(var i=0; i<checkboxes_a.length; i++){
-			checkboxes_a[i].checked = checkMain.checked;
+			checkboxes_a[i].checked = checkboxElem.checked;
 		}
-		checkAllDescendance(checkMain);
+		checkAllDescendance(checkboxElem);
 	}
 </script>
 {% endblock %}
