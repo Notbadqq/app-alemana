@@ -1,0 +1,32 @@
+{% extends "base_template.html"%}
+{%block title%}<title>Verificar Cohorte</title>{%endblock%}
+{%block script%}
+<script>
+    /*
+    Funcion que chequea el estado de un checkbox para añadir o quitar de la 
+    cohorte un concepto
+    */
+    function checkChange(checkboxElem, desc, id){
+        if (checkboxElem.checked){
+            $.getJSON("{{ url_for('show_lista')}}", {description:desc, id:id, tipo:'check'})
+        }else{
+            $.getJSON("{{ url_for('show_lista')}}", {description:desc, id:id, tipo:'uncheck'})
+        }
+    }
+</script>
+{%endblock%}
+{%block content%}
+    {%for i in range(length)%}
+    <div class="row">
+        <div class="col-md-6">
+            <input type="checkbox" id="{{lista[i]}}"  name='hijo' value="{{lista[i]}}" onchange='checkChange(this,"{{lista[i]}}", "{{listaid[i]}}")'>{{lista[i]}}
+        </div>
+        <div class="col-md-4">
+            <label>{{listaid[i]}}</label><br>
+        </div>
+    </div>
+    <script>
+        pageCheck("{{lista[i]}}")
+    </script>
+    {%endfor%}
+{%endblock%}

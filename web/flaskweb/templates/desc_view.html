@@ -1,0 +1,213 @@
+{% extends "base_template.html" %}
+{% block title %}<title>{{query[0]}}</title>{% endblock %}
+{% block script %}
+<script>
+	/*
+	Variables creadas para arreglar problema con paso de variables de una funcion a otra,
+	ya que al tomarlas desde python las transformaba a string.
+	*/
+	var rowstp_p = []
+    var rowsid_p = []
+	var rowstp_h = []
+    var rowsid_h = []
+	/*
+	Una vez cargada la pagina se ejecuta esta funcion para revisar el estado de 
+	los checkboxes select all.
+	*/
+	window.onload = function(){
+		checkboxes_h = document.getElementsByName("hijo");
+		checkboxes_p = document.getElementsByName("padre");
+		checkboxes_a = document.getElementsByName("ancestor");
+		checkSelectAll('bigbro', checkboxes_h);
+		checkSelectAll('bigdaddy', checkboxes_p);
+		checkSelectAll('kiddo', checkboxes_a);
+	}
+
+	/*
+	Funcion que revisa si todos los checkboxes de uno de los padres estan checked
+	Recibe un nombre de checkbox padre y las checkboxes a chequear
+	*/
+	function checkSelectAll(checkName, checkboxes){
+		for(var x=0; x<checkboxes.length; x++){
+			if (!checkboxes[x].checked){
+				document.getElementById(checkName).checked = false;
+				break;
+			}
+			else{document.getElementById(checkName).checked = true;}
+		}
+	}
+	/*
+    Funcion que chequea el estado de un checkbox para añadir o quitar de la 
+    cohorte un concepto
+    */
+	function checkChange(checkboxElem, desc, id){
+
+        if (checkboxElem.checked){
+            $.getJSON("{{ url_for('show_lista')}}", {description:desc, id:id, tipo:'check'})
+        }else{
+            $.getJSON("{{ url_for('show_lista')}}", {description:desc, id:id, tipo:'uncheck'})
+        }
+		if (checkboxElem.name == 'hijo'){
+			checkSelectAll('bigbro', checkboxes_h);
+		}else if(checkboxElem.name == 'padre'){
+			checkSelectAll('bigdaddy', checkboxes_p);
+		}else if(checkboxElem.name == 'ancestor'){
+			checkSelectAll('kiddo', checkboxes_a);
+		}
+    }
+</script>
+
+<!--Se agregan los datos de descripciones e ids a las variables-->
+{% for i in range(lenp) %}
+    <script>
+        rowstp_p.push("{{rowsp[i]}}")
+        rowsid_p.push("{{rowspid[i]}}")		
+    </script>
+{% endfor %}
+{% for i in range(lenh) %}
+    <script>
+        rowstp_h.push("{{rowsh[i]}}")
+        rowsid_h.push("{{rowshid[i]}}")
+    </script>
+{% endfor %}
+<script>
+	/*
+	Funcion para el check all de los terminos padre.
+	*/
+	function checkFatherChange(checkboxElem){
+		for(var i=0; i<checkboxes_p.length; i++){
+			checkboxes_p[i].checked = checkboxElem.checked;
+		}
+		checkChangeDirect(checkboxElem, rowstp_p)
+	}
+	/*
+	Funcion para el check all de los terminos hijo.
+	*/
+	function checkSonChange(checkboxElem){
+		for(var i=0; i<checkboxes_h.length; i++){
+			checkboxes_h[i].checked = checkboxElem.checked;
+		}
+		checkChangeDirect(checkboxElem, rowstp_h)
+	}
+	/*
+	Funcion para agregar todas las descendencias a la lista
+	*/
+	function checkChangeDirect(checkboxElem, concepts, familiar){
+		var query = "";
+		for (var x=0; x<concepts.length; x++){
+			query = query.concat("'")
+			query = query.concat(String(concepts[x]));
+			query = query.concat("', ")
+		}
+		if (checkboxElem.checked){
+                    $.getJSON("{{ url_for('allDirect')}}", {concept:query, action:'check'})
+                }else{
+                    $.getJSON("{{ url_for('allDirect')}}", {concept:query, action:'uncheck'})
+                }
+	}
+	/*
+	Funcion para agregar todas las descendencias a la lista
+	*/
+	function checkAllDescendance(checkMain){
+		var query = "";
+		for (var x=0; x<rowstp_h.length; x++){
+			query = query.concat("'")
+			query = query.concat(String(rowstp_h[x]));
+			query = query.concat("', ")
+		}
+		if (checkMain.checked){
+                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'check'})
+                }else{
+                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'uncheck'})
+                }
+	}
+	/*
+	Funcion para seleccionar toda la descendencia de un checkbox
+	*/
+	function checkDescendance(checkboxElem, desc){
+		if (checkboxElem.checked){
+                    $.getJSON("{{ url_for('descendance')}}", {concept:desc, action:'check'})
+                }else{
+                    $.getJSON("{{ url_for('descendance')}}", {concept:desc, action:'uncheck'})
+                }
+	}
+	/*
+	Funcion para agregar todas las descendencias a la lista
+	*/
+	function checkAllDescendance(checkMain){
+		var query = "";
+		for (var x=0; x<rowstp_h.length; x++){
+			query = query.concat("'")
+			query = query.concat(String(rowstp_h[x]));
+			query = query.concat("', ")
+		}
+		if (checkMain.checked){
+                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'check'})
+                }else{
+                    $.getJSON("{{ url_for('allDescendance')}}", {concept:query, action:'uncheck'})
+                }
+	}
+	/*
+	Funcion para seleccionar todos los checkboxes de descendencia
+	*/
+	function selectAllDescendancy(checkMain){
+		for(var i=0; i<checkboxes_a.length; i++){
+			checkboxes_a[i].checked = checkMain.checked;
+		}
+		checkAllDescendance(checkMain);
+	}
+</script>
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-4"><input type="checkbox" id="bigdaddy" onchange="checkFatherChange(this)">Select All</div>
+				<div class="col-md-3"> Padres: {{lenp}} </div>
+			</div>
+			<br>
+			{% for i in range(lenp) %}
+			<div class="row">
+				<div class="col-md-11"><input type="checkbox" id="{{rowsp[i]}}" name="padre" onchange='checkChange(this,"{{rowsp[i]}}","{{rowspid[i]}}")'><a href="/search_results/{{rowsp[i]}}">{{rowsp[i]}}</a></div>
+			</div>
+			<script>
+				pageCheck("{{rowsp[i]}}")
+			</script>
+			{% endfor %}
+		</div>
+		<div class="col-md-4">
+			<div class="row">
+					<input type="checkbox" id="{{query[0]}}" value="{{query[0]}}" onchange='checkChange(this,"{{query[0]}}", "{{query[1]}}")'>
+					Description: {{query[0]}}
+					<script>
+						pageCheck("{{query[0]}}")
+					</script>
+			</div>
+			<div class="row">
+				<div class="col-md-11">
+					Concept ID: {{query[1]}}
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-4"><input type="checkbox" id="bigbro" onchange="checkSonChange(this)">Select All</div>
+				<div class="col-md-3">Hijos: {{lenh}}</div>
+				<div class="col-md-4 text-right">All Descendance</div>
+				<div class="col-md-1"><input type="checkbox" id="kiddo" onchange="selectAllDescendancy(this)"></div>
+			</div>
+			<br>
+			{% for i in range(lenh) %}
+			<div class="row">
+				<div class="col-md-11"><input type="checkbox" id="{{rowsh[i]}}" name="hijo" onchange='checkChange(this,"{{rowsh[i]}}","{{rowshid[i]}}")'><a href="/search_results/{{rowsh[i]}}">{{rowsh[i]}}</a></div>
+				<div class="col-md-1"><input type="checkbox" name="ancestor" onchange='checkDescendance(this, "{{rowsh[i]}}")'></div>
+				<script>
+					pageCheck("{{rowsh[i]}}")
+				</script>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{% endblock %}
