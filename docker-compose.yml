@@ -2,9 +2,8 @@ version: '3'
 
 services:
   web:
+    restart: always
     build: ./web
-    depends_on:
-      - mydb
     ports:
       - 5000:5000
     volumes:
@@ -12,10 +11,13 @@ services:
     networks:
       - test-net
     environment:
-      SECRET_KEY: 7110c8ae51a4b5af97be6534caef90e4bb9bdcb3380af008f90b23a5d1616bf319bc298105da20fe
+      SECRET_KEY: postgres
       ENGINE: postgres://postgres:postgres@mydb:5432/data
+    depends_on:
+      - mydb
 
   mydb:
+    restart: always
     image: postgres
     volumes:
       - ./data:/var/lib/postgresql/data
@@ -28,10 +30,24 @@ services:
     networks:
       - test-net
 
-volumes: 
-  db-data:
-    driver: local
-
+  pgadmin:
+    restart: always
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - test-net
 networks:
   test-net:
     driver: bridge
+volumes:
+  pgadmin:
+    driver: local
+  db-data:
+    driver: local

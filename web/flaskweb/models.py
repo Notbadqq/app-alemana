@@ -23,13 +23,16 @@ try:
     connection.execute('CREATE TABLE token_table(termino_preferido VARCHAR(300), token tsvector, concept_id_hiba BIGINT)')
 except:
     pass
-connection.execute('INSERT INTO token_table(termino_preferido, token, concept_id_hiba) SELECT termino_preferido, to_tsvector(termino_preferido) as token, "concept_id_HIBA" FROM cas_hiba ON CONFLICT (termino_preferido) DO NOTHING')
+connection.execute('INSERT INTO token_table(termino_preferido, token, concept_id_hiba) SELECT termino_preferido, to_tsvector(termino_preferido) as token, "concept_id_HIBA" FROM cas_hiba')
 
 #Clase que modela tabla token_table de la base de datos
 class Token_table(Base):
     """"""
     __table__ = Table('token_table', Base.metadata,
                     autoload=True, autoload_with=engine)
+    __mapper_args__ = {
+        'primary_key':[__table__.c.concept_id_hiba] #SQLAlchemy pide que al menos una columna sea PK.
+    }
 
 #Algo que saque de por ahi... Creo que no esta haciendo nada
 def loadSession():
